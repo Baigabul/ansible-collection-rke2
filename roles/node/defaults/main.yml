@@ -139,8 +139,10 @@ rke2_kubelet_config_name: 10-ansible
 
 rke2_kube_apiserver_arg: []
 rke2_kube_controller_manager_arg:
-  - "terminated-pod-gc-threshold=12500"
-rke2_kube_scheduler_arg: []
+  - terminated-pod-gc-threshold=12500
+  - bind-address=0.0.0.0
+rke2_kube_scheduler_arg:
+  - bind-address=0.0.0.0
 rke2_etcd_arg: []
 
 # Arbitrary extra keys merged into config.yaml as-is (dict → YAML).
