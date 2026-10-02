@@ -88,6 +88,26 @@ The contract maps cleanly onto dynamic inventory plugins (KubeVirt, AWS, OpenSta
 
 Working example: [`examples/inventory-kubevirt/`](examples/inventory-kubevirt/).
 
+## Adding a node
+
+There is no dedicated playbook: add the host to the inventory (`rke2_agents` or one of its child groups for a worker, `rke2_servers` for a control-plane node) and run `deploy` limited to it:
+
+```bash
+ansible-playbook maksimrudakov.rke2.deploy -i inventory/<env>/ --limit <NEW_NODE> --check --diff
+ansible-playbook maksimrudakov.rke2.deploy -i inventory/<env>/ --limit <NEW_NODE>
+```
+
+The rest of the cluster is not touched. The join still works although the bootstrap server is outside the limit: `--limit` narrows only the hosts the plays run on, while the whole inventory (groups, host vars) stays loaded. The new node therefore still resolves `rke2_bootstrap_host` from `groups['rke2_servers']`, builds `rke2_server_url` from its `ansible_host`, and reads the join token with `slurp` + `delegate_to` — delegation targets any inventory host, limited or not, using its connection vars. The control host needs SSH access to the bootstrap server; no facts from it are required.
+
+- **A new server must not become `rke2_servers[0]`**, or it bootstraps a separate cluster. With dynamic inventories (alphabetical order) pin `rke2_first_server: true` on the real bootstrap node.
+- Add control-plane nodes one at a time and keep their count odd. If `rke2_tls_san` changes for the new server, run `maksimrudakov.rke2.rotate_certs` afterwards.
+- Keep the node on the cluster's `rke2_version` and the same air-gap settings (`group_vars/all`).
+- Rollback: `remove_node` with the host passed explicitly (`--limit` alone is a no-op by design — the play targets a sentinel until `rke2_remove_hosts` is set):
+
+  ```bash
+  ansible-playbook maksimrudakov.rke2.remove_node -i inventory/<env>/ -e rke2_remove_hosts=<NEW_NODE>
+  ```
+
 ## Configuration
 
 Canonical variable reference: [`roles/node/meta/argument_specs.yml`](roles/node/meta/argument_specs.yml) (and [`roles/fleet/meta/argument_specs.yml`](roles/fleet/meta/argument_specs.yml) for Fleet). By area:

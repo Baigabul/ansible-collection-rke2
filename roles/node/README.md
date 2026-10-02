@@ -4,6 +4,8 @@ Converges a single RKE2 node: installs the requested version (online or through 
 
 Not meant to be used alone for whole-cluster operations — the collection ships playbooks (`maksimrudakov.rke2.deploy`, `upgrade`, `reconfig`, `rotate_certs`) that orchestrate this role with correct ordering, `serial: 1` for control-plane nodes and cordon/drain around restarts. See the [collection README](../../README.md).
 
+For adding a single node use `deploy --limit`, the role is what `deploy` runs — see [Adding a node](../../README.md#adding-a-node).
+
 ## Variables
 
 Full list with types and descriptions: [`meta/argument_specs.yml`](meta/argument_specs.yml). Required: `rke2_role` (`server` / `agent`). Joining nodes need `rke2_server_url` + `rke2_token`, or an inventory following the `rke2_servers` group contract for auto-derivation.
