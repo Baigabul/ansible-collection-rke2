@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 
 ## [Unreleased]
 
+### Added
+- README: "Adding a node" section — `deploy --limit <NEW_NODE>` and why token/URL derivation over delegation works outside the limit; the node role README points to it.
+
 ## [1.5.1] - 2026-09-06
 
 ### Fixed
