@@ -102,7 +102,11 @@ The rest of the cluster is not touched. The join still works although the bootst
 - **A new server must not become `rke2_servers[0]`**, or it bootstraps a separate cluster. With dynamic inventories (alphabetical order) pin `rke2_first_server: true` on the real bootstrap node.
 - Add control-plane nodes one at a time and keep their count odd. If `rke2_tls_san` changes for the new server, run `maksimrudakov.rke2.rotate_certs` afterwards.
 - Keep the node on the cluster's `rke2_version` and the same air-gap settings (`group_vars/all`).
-- Rollback: `maksimrudakov.rke2.remove_node --limit <NEW_NODE>`.
+- Rollback: `remove_node` with the host passed explicitly (`--limit` alone is a no-op by design — the play targets a sentinel until `rke2_remove_hosts` is set):
+
+  ```bash
+  ansible-playbook maksimrudakov.rke2.remove_node -i inventory/<env>/ -e rke2_remove_hosts=<NEW_NODE>
+  ```
 
 ## Configuration
 
